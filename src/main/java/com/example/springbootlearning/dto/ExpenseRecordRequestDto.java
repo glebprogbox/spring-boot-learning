@@ -1,20 +1,20 @@
-package com.example.springbootlearning.model;
+package com.example.springbootlearning.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Data
 public class ExpenseRecordRequestDto {
 
     @PositiveOrZero(message = "id cannot be negative")
-    @Digits(integer = 8, fraction = 0, message = "ID must be an integer and no more than 8 characters")
-    private int id;
+    @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
+    private long id;
     @Length(min = 1, max = 100, message = "100 or more characters are used for code")
     @NotBlank(message = "code cannot be blank")
     @Pattern(regexp = "[A-ZА-Я_]*", message = "the code must match the template \"A-ZА-Я_\"")
@@ -25,6 +25,5 @@ public class ExpenseRecordRequestDto {
     @NotNull(message = "date cannot be null")
     @PastOrPresent(message = "the date must be in the past or present")
     private LocalDate date;
-    @Length(min = 0, max = 1000, message = "1000 or more characters are used for comment")
-    private String comment;
+    private Optional<String> comment;
 }

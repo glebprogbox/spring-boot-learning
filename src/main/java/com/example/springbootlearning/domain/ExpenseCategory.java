@@ -1,4 +1,4 @@
-package com.example.springbootlearning.model;
+package com.example.springbootlearning.domain;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

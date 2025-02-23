@@ -1,8 +1,8 @@
 package com.example.springbootlearning.service;
 
-import com.example.springbootlearning.exceptions.EmployeeAlreadyExistsException;
-import com.example.springbootlearning.exceptions.EmployeeNotFoundException;
-import com.example.springbootlearning.model.Employee;
+import com.example.springbootlearning.domain.Employee;
+import com.example.springbootlearning.exceptions.EntityAlreadyExistsException;
+import com.example.springbootlearning.exceptions.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,29 +12,26 @@ import java.util.List;
 @Slf4j
 @Service
 public class EmployeeService {
-    private static final List<Employee> employeeList = new ArrayList<>();
+    private final List<Employee> employeeList = new ArrayList<>();
 
-    public static List<Employee> getAllEmployees() {
-        return new ArrayList<>(employeeList);
+    public List<Employee> getAllEmployees() {
+        return employeeList;
     }
 
-    public Employee getEmployeeById(int id) throws EmployeeNotFoundException {
-        return notFoundEmployeeByIdException(id);
-    }
-
-    public static Employee createEmployee(Employee employee) throws EmployeeAlreadyExistsException {
-        foundEmployeeByIdException(employee.getId());
+    public Employee createEmployee(Employee employee) throws EntityAlreadyExistsException {
+        checkExistsEmployeeById(employee.getId());
         employeeList.add(employee);
         return employee;
     }
 
-    public void deleteEmployeeById(int id) throws EmployeeNotFoundException {
-        Employee employee = notFoundEmployeeByIdException(id);
+    public void deleteEmployeeById(long id) throws EntityNotFoundException {
+        Employee employee = getEmployeeById(id);
         employeeList.remove(employee);
     }
 
-    public Employee updateEmployeeById(String fullName, String position, int employeeId) throws EmployeeNotFoundException {
-        Employee newEmployee = notFoundEmployeeByIdException(employeeId);
+    public Employee updateEmployeeById(String fullName, String position, long employeeId)
+            throws EntityNotFoundException {
+        Employee newEmployee = getEmployeeById(employeeId);
         if (fullName != null) {
             newEmployee.setFullName(fullName);
         }
@@ -44,27 +41,27 @@ public class EmployeeService {
         return newEmployee;
     }
 
-    static Employee notFoundEmployeeByIdException(int id) throws EmployeeNotFoundException {
-        Employee employee = searchEmployeeById(id);
-        if (employee == null) {
+     public Employee getEmployeeById(long id) throws EntityNotFoundException {
+        Employee employee = searchInListEmployeeById(id);
+        if (searchInListEmployeeById(id) == null) {
             log.info("Employee with ID: {} not found", id);
-            throw new EmployeeNotFoundException("Employee with ID: " + id + " not found", id);
+            throw new EntityNotFoundException("Employee with ID: " + id + " not found", String.valueOf(id));
         }
         return employee;
     }
 
-    static void foundEmployeeByIdException(int id) throws EmployeeAlreadyExistsException {
-        if (searchEmployeeById(id) != null) {
+    void checkExistsEmployeeById(long id) throws EntityAlreadyExistsException {
+        if (searchInListEmployeeById(id) != null) {
             log.info("Employee with ID: {} already exists", id);
-            throw new EmployeeAlreadyExistsException("Employee with ID: " + id + " already exists", id);
+            throw new EntityAlreadyExistsException("Employee with ID: " + id + " already exists", String.valueOf(id));
         }
     }
 
-    static Employee searchEmployeeById(int id) {
-        if (employeeList.isEmpty()) {
-            return null;
-        }
-        return employeeList.stream().filter(employee -> employee.getId() == id).findFirst().orElse(null);
+    Employee searchInListEmployeeById(long id) {
+        return employeeList.stream()
+                .filter(employee -> id == employee.getId())
+                .findFirst()
+                .orElse(null);
     }
 
 }

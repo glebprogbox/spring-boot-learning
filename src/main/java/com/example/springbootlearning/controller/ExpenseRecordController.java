@@ -1,9 +1,8 @@
 package com.example.springbootlearning.controller;
 
-import com.example.springbootlearning.exceptions.CategoryNotFoundException;
-import com.example.springbootlearning.exceptions.EmployeeNotFoundException;
-import com.example.springbootlearning.model.ExpenseRecord;
-import com.example.springbootlearning.model.ExpenseRecordRequestDto;
+import com.example.springbootlearning.exceptions.EntityNotFoundException;
+import com.example.springbootlearning.domain.ExpenseRecord;
+import com.example.springbootlearning.dto.ExpenseRecordRequestDto;
 import com.example.springbootlearning.service.EmployeeService;
 import com.example.springbootlearning.service.ExpenseCategoryService;
 import com.example.springbootlearning.service.ExpenseRecordService;
@@ -21,7 +20,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("api/v1/records")
+@RequestMapping("/api/v1/records")
 @Validated
 public class ExpenseRecordController {
     private final ExpenseRecordService expenseRecordService;
@@ -34,45 +33,45 @@ public class ExpenseRecordController {
         this.employeeService = new EmployeeService();
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping()
     public List<ExpenseRecord> getAllExpenses() {
         return expenseRecordService.getAllExpenses();
     }
 
-    @GetMapping(path = "/searchByCategory/{code}", produces = "application/json")
+    @GetMapping(path = "/searchByCategory/{code}")
     public List<ExpenseRecord> getExpensesByCategory(
             @PathVariable
             @NotBlank(message = "code cannot be blank")
             @Length(min = 1, max = 100, message = "100 or more characters are used for code")
             @Pattern(regexp = "[A-ZА-Я_]*", message = "the code must match the template \"A-ZА-Я_\"")
             String code)
-            throws CategoryNotFoundException {
+            throws EntityNotFoundException {
         return expenseRecordService.getExpensesByCategory(code);
     }
 
-    @GetMapping(path = "/searchByEmployee/{id}", produces = "application/json")
+    @GetMapping(path = "/searchByEmployee/{id}")
     public List<ExpenseRecord> getExpensesByEmployee(
             @PathVariable
             @PositiveOrZero(message = "id cannot be negative")
-            @Digits(integer = 8, fraction = 0, message = "ID must be an integer and no more than 8 characters")
-            int id)
-            throws EmployeeNotFoundException {
+            @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
+            long id)
+            throws EntityNotFoundException {
         return expenseRecordService.getExpensesByEmployee(id);
     }
 
-    @PostMapping(produces = "application/json", consumes = "application/json")
+    @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public ExpenseRecord addExpense(
             @RequestBody
             @Valid
             ExpenseRecordRequestDto expenseRecordRequestDto)
-            throws EmployeeNotFoundException, CategoryNotFoundException {
-        ExpenseRecord er = new ExpenseRecord(
+            throws EntityNotFoundException {
+        ExpenseRecord expenseRecord = new ExpenseRecord(
                 employeeService.getEmployeeById(expenseRecordRequestDto.getId()),
                 expenseCategoryService.getCategoryByCode(expenseRecordRequestDto.getCode()),
                 expenseRecordRequestDto.getAmount(),
                 expenseRecordRequestDto.getDate(),
-                expenseRecordRequestDto.getComment());
-        return expenseRecordService.addExpense(er);
+                expenseRecordRequestDto.getComment().orElse(null));
+        return expenseRecordService.addExpense(expenseRecord);
     }
 }

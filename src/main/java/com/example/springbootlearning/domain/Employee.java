@@ -1,4 +1,4 @@
-package com.example.springbootlearning.model;
+package com.example.springbootlearning.domain;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -11,8 +11,8 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 public class Employee {
     @PositiveOrZero(message = "id cannot be negative")
-    @Digits(integer = 8, fraction = 0, message = "ID must be an integer and no more than 8 characters")
-    private final int id;
+    @Digits(fraction = 0, message = "ID must be an long and no more than 18 characters", integer = 18)
+    private final long id;
     @Length(min = 1, max = 100, message = "100 or more characters are used for Fullname")
     @NotBlank(message = "fullName cannot be blank")
     private String fullName;

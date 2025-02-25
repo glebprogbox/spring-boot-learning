@@ -3,9 +3,9 @@ package com.example.springbootlearning.controller;
 import com.example.springbootlearning.exceptions.EntityNotFoundException;
 import com.example.springbootlearning.domain.ExpenseRecord;
 import com.example.springbootlearning.dto.ExpenseRecordRequestDto;
-import com.example.springbootlearning.service.EmployeeService;
-import com.example.springbootlearning.service.ExpenseCategoryService;
-import com.example.springbootlearning.service.ExpenseRecordService;
+import com.example.springbootlearning.service.EmployeeCommandService;
+import com.example.springbootlearning.service.ExpenseCommandCategoryService;
+import com.example.springbootlearning.service.ExpenseCommandRecordService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -17,25 +17,28 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/api/v1/records")
 @Validated
 public class ExpenseRecordController {
-    private final ExpenseRecordService expenseRecordService;
-    private final ExpenseCategoryService expenseCategoryService;
-    private final EmployeeService employeeService;
+    private final ExpenseCommandRecordService expenseCommandRecordService;
+    private final ExpenseCommandCategoryService expenseCommandCategoryService;
+    private final EmployeeCommandService employeeCommandService;
 
-    public ExpenseRecordController(ExpenseRecordService expenseRecordService) {
-        this.expenseRecordService = expenseRecordService;
-        this.expenseCategoryService = new ExpenseCategoryService();
-        this.employeeService = new EmployeeService();
+    public ExpenseRecordController(ExpenseCommandRecordService expenseCommandRecordService,
+                                   ExpenseCommandCategoryService expenseCommandCategoryService,
+                                   EmployeeCommandService employeeCommandService) {
+        this.expenseCommandRecordService = expenseCommandRecordService;
+        this.expenseCommandCategoryService = expenseCommandCategoryService;
+        this.employeeCommandService = employeeCommandService;
     }
 
     @GetMapping()
     public List<ExpenseRecord> getAllExpenses() {
-        return expenseRecordService.getAllExpenses();
+        return expenseCommandRecordService.getAllExpenses();
     }
 
     @GetMapping(path = "/searchByCategory/{code}")
@@ -46,7 +49,7 @@ public class ExpenseRecordController {
             @Pattern(regexp = "[A-ZА-Я_]*", message = "the code must match the template \"A-ZА-Я_\"")
             String code)
             throws EntityNotFoundException {
-        return expenseRecordService.getExpensesByCategory(code);
+        return expenseCommandRecordService.getExpensesByCategory(code);
     }
 
     @GetMapping(path = "/searchByEmployee/{id}")
@@ -56,7 +59,7 @@ public class ExpenseRecordController {
             @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
             long id)
             throws EntityNotFoundException {
-        return expenseRecordService.getExpensesByEmployee(id);
+        return expenseCommandRecordService.getExpensesByEmployee(id);
     }
 
     @PostMapping()
@@ -67,11 +70,11 @@ public class ExpenseRecordController {
             ExpenseRecordRequestDto expenseRecordRequestDto)
             throws EntityNotFoundException {
         ExpenseRecord expenseRecord = new ExpenseRecord(
-                employeeService.getEmployeeById(expenseRecordRequestDto.getId()),
-                expenseCategoryService.getCategoryByCode(expenseRecordRequestDto.getCode()),
+                employeeCommandService.getEmployeeById(expenseRecordRequestDto.getId()),
+                expenseCommandCategoryService.getCategoryByCode(expenseRecordRequestDto.getCode()),
                 expenseRecordRequestDto.getAmount(),
                 expenseRecordRequestDto.getDate(),
                 expenseRecordRequestDto.getComment().orElse(null));
-        return expenseRecordService.addExpense(expenseRecord);
+        return expenseCommandRecordService.addExpense(expenseRecord);
     }
 }

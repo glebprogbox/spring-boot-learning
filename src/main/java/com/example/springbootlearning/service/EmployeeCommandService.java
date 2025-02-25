@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
-public class EmployeeService {
+public class EmployeeCommandService {
     private final List<Employee> employeeList = new ArrayList<>();
 
     public List<Employee> getAllEmployees() {
@@ -32,36 +33,31 @@ public class EmployeeService {
     public Employee updateEmployeeById(String fullName, String position, long employeeId)
             throws EntityNotFoundException {
         Employee newEmployee = getEmployeeById(employeeId);
-        if (fullName != null) {
-            newEmployee.setFullName(fullName);
-        }
-        if (position != null) {
-            newEmployee.setPosition(position);
-        }
+        newEmployee.setFullName(fullName != null ? fullName : newEmployee.getFullName());
+        newEmployee.setPosition(position != null ? position : newEmployee.getPosition());
         return newEmployee;
     }
 
-     public Employee getEmployeeById(long id) throws EntityNotFoundException {
-        Employee employee = searchInListEmployeeById(id);
-        if (searchInListEmployeeById(id) == null) {
+    public Employee getEmployeeById(long id) throws EntityNotFoundException {
+        Optional<Employee> employee = searchInListEmployeeById(id);
+        if (employee.isEmpty()) {
             log.info("Employee with ID: {} not found", id);
             throw new EntityNotFoundException("Employee with ID: " + id + " not found", String.valueOf(id));
         }
-        return employee;
+        return employee.get();
     }
 
     void checkExistsEmployeeById(long id) throws EntityAlreadyExistsException {
-        if (searchInListEmployeeById(id) != null) {
+        if (searchInListEmployeeById(id).isPresent()) {
             log.info("Employee with ID: {} already exists", id);
             throw new EntityAlreadyExistsException("Employee with ID: " + id + " already exists", String.valueOf(id));
         }
     }
 
-    Employee searchInListEmployeeById(long id) {
+    Optional<Employee> searchInListEmployeeById(long id) {
         return employeeList.stream()
-                .filter(employee -> id == employee.getId())
-                .findFirst()
-                .orElse(null);
+                .filter(employee -> Long.valueOf(id).equals(employee.getId()))
+                .findFirst();
     }
 
 }

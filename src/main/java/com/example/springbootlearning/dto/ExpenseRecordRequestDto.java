@@ -14,6 +14,7 @@ public class ExpenseRecordRequestDto {
 
     @PositiveOrZero(message = "id cannot be negative")
     @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
+    @NotNull(message = "id employee cannot be null")
     private long id;
     @Length(min = 1, max = 100, message = "100 or more characters are used for code")
     @NotBlank(message = "code cannot be blank")

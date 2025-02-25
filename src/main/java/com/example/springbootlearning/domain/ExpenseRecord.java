@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +23,5 @@ public class ExpenseRecord {
     @NotNull(message = "date cannot be null")
     @PastOrPresent(message = "the date must be in the past or present")
     private LocalDate date;
-    @Length(min = 1, max = 1000, message = "1000 or more characters are used for comment")
     private String comment;
 }

@@ -3,7 +3,7 @@ package com.example.springbootlearning.controller;
 import com.example.springbootlearning.domain.Employee;
 import com.example.springbootlearning.exceptions.EntityAlreadyExistsException;
 import com.example.springbootlearning.exceptions.EntityNotFoundException;
-import com.example.springbootlearning.service.EmployeeService;
+import com.example.springbootlearning.service.EmployeeCommandService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -17,15 +17,15 @@ import java.util.List;
 @RequestMapping("/api/v1/employees")
 @Validated
 public class EmployeeController {
-    private final EmployeeService employeeService;
+    private final EmployeeCommandService employeeCommandService;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeController(EmployeeCommandService employeeCommandService) {
+        this.employeeCommandService = employeeCommandService;
     }
 
     @GetMapping()
     public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+        return employeeCommandService.getAllEmployees();
     }
 
     @GetMapping(path = "/{id}")
@@ -35,7 +35,7 @@ public class EmployeeController {
             @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
             long id)
             throws EntityNotFoundException {
-        return employeeService.getEmployeeById(id);
+        return employeeCommandService.getEmployeeById(id);
     }
 
     @PostMapping()
@@ -45,7 +45,7 @@ public class EmployeeController {
             @Valid
             Employee createEmployee)
             throws EntityAlreadyExistsException {
-        return employeeService.createEmployee(createEmployee);
+        return employeeCommandService.createEmployee(createEmployee);
     }
 
     @DeleteMapping(path = "/{id}")
@@ -56,7 +56,7 @@ public class EmployeeController {
             @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
             long id)
             throws EntityNotFoundException {
-        employeeService.deleteEmployeeById(id);
+        employeeCommandService.deleteEmployeeById(id);
     }
 
     @PutMapping()
@@ -66,7 +66,7 @@ public class EmployeeController {
             @Valid
             Employee updateEmployee)
             throws EntityNotFoundException {
-        return employeeService.updateEmployeeById(
+        return employeeCommandService.updateEmployeeById(
                 updateEmployee.getFullName(),
                 updateEmployee.getPosition(),
                 updateEmployee.getId());

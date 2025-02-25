@@ -13,14 +13,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ExpenseRecordService {
+public class ExpenseCommandRecordService {
     private final List<ExpenseRecord> expenseRecordList = new ArrayList<>();
-    private final EmployeeService employeeService;
-    private final ExpenseCategoryService expenseCategoryService;
+    private final EmployeeCommandService employeeCommandService;
+    private final ExpenseCommandCategoryService expenseCommandCategoryService;
 
-    public ExpenseRecordService(EmployeeService employeeService, ExpenseCategoryService expenseCategoryService) {
-        this.employeeService = employeeService;
-        this.expenseCategoryService = expenseCategoryService;
+    public ExpenseCommandRecordService(EmployeeCommandService employeeCommandService,
+                                       ExpenseCommandCategoryService expenseCommandCategoryService) {
+        this.employeeCommandService = employeeCommandService;
+        this.expenseCommandCategoryService = expenseCommandCategoryService;
     }
 
     public List<ExpenseRecord> getAllExpenses() {
@@ -29,8 +30,8 @@ public class ExpenseRecordService {
 
     public ExpenseRecord addExpense(ExpenseRecord expenseRecord)
             throws EntityNotFoundException {
-        employeeService.getEmployeeById(expenseRecord.getEmployee().getId());
-        expenseCategoryService.getCategoryByCode(expenseRecord.getCategory().getCode());
+        employeeCommandService.getEmployeeById(expenseRecord.getEmployee().getId());
+        expenseCommandCategoryService.getCategoryByCode(expenseRecord.getCategory().getCode());
         expenseRecordList.add(expenseRecord);
         return expenseRecord;
     }
@@ -40,13 +41,13 @@ public class ExpenseRecordService {
             @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
             long employeeId)
             throws EntityNotFoundException {
-        employeeService.getEmployeeById(employeeId);
+        employeeCommandService.getEmployeeById(employeeId);
         return expenseRecordList.stream().filter(e -> e.getEmployee().getId() == employeeId).
                 collect(Collectors.toList());
     }
 
     public List<ExpenseRecord> getExpensesByCategory(String code) throws EntityNotFoundException {
-        expenseCategoryService.getCategoryByCode(code);
+        expenseCommandCategoryService.getCategoryByCode(code);
         return expenseRecordList.stream()
                 .filter(e -> e.getCategory().getCode().equals(code))
                 .collect(Collectors.toList());

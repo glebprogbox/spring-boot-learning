@@ -42,18 +42,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleEmployeeNotFoundException(EntityNotFoundException ex) {
+    public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
-        errorResponse.put("employeeId", String.valueOf(ex.getCode()));
+        errorResponse.put("code", String.valueOf(ex.getCode()));
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleEmployeeAlreadyExistsException(EntityAlreadyExistsException ex) {
+    public ResponseEntity<Map<String, String>> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex) {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
-        errorResponse.put("employeeId", String.valueOf(ex.getCode()));
+        errorResponse.put("code", String.valueOf(ex.getCode()));
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 

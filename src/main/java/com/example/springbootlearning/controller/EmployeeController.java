@@ -4,6 +4,7 @@ import com.example.springbootlearning.domain.Employee;
 import com.example.springbootlearning.exceptions.EntityAlreadyExistsException;
 import com.example.springbootlearning.exceptions.EntityNotFoundException;
 import com.example.springbootlearning.service.EmployeeCommandService;
+import com.example.springbootlearning.service.EmployeeQueryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -18,14 +19,16 @@ import java.util.List;
 @Validated
 public class EmployeeController {
     private final EmployeeCommandService employeeCommandService;
+    private final EmployeeQueryService employeeQueryService;
 
-    public EmployeeController(EmployeeCommandService employeeCommandService) {
+    public EmployeeController(EmployeeCommandService employeeCommandService, EmployeeQueryService employeeQueryService) {
         this.employeeCommandService = employeeCommandService;
+        this.employeeQueryService = employeeQueryService;
     }
 
     @GetMapping()
     public List<Employee> getAllEmployees() {
-        return employeeCommandService.getAllEmployees();
+        return employeeQueryService.getAllEmployees();
     }
 
     @GetMapping(path = "/{id}")
@@ -35,7 +38,7 @@ public class EmployeeController {
             @Digits(integer = 18, fraction = 0, message = "ID must be an long and no more than 18 characters")
             long id)
             throws EntityNotFoundException {
-        return employeeCommandService.getEmployeeById(id);
+        return employeeQueryService.getEmployeeById(id);
     }
 
     @PostMapping()

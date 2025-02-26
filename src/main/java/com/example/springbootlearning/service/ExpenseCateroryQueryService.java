@@ -1,40 +1,26 @@
 package com.example.springbootlearning.service;
 
+import com.example.springbootlearning.domain.ExpenseCategory;
 import com.example.springbootlearning.exceptions.EntityAlreadyExistsException;
 import com.example.springbootlearning.exceptions.EntityNotFoundException;
-import com.example.springbootlearning.domain.ExpenseCategory;
+import com.example.springbootlearning.repository.ExpenseCategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
-public class ExpenseCommandCategoryService {
-    private final List<ExpenseCategory> expenseCategoryList = new ArrayList<>();
+public class ExpenseCateroryQueryService {
+    private final ExpenseCategoryRepository expenseCategoryRepository;
+
+    public ExpenseCateroryQueryService(ExpenseCategoryRepository expenseCategoryRepository) {
+        this.expenseCategoryRepository = expenseCategoryRepository;
+    }
 
     public List<ExpenseCategory> getAllCategories() {
-        return expenseCategoryList;
-    }
-
-    public ExpenseCategory createCategory(ExpenseCategory expenseCategory) throws EntityAlreadyExistsException {
-        checkExistsCategoryByCode(expenseCategory.getCode());
-        expenseCategoryList.add(expenseCategory);
-        return expenseCategory;
-    }
-
-    public void deleteCategoryByCode(String code) throws EntityNotFoundException {
-        ExpenseCategory expenseCategory = getCategoryByCode(code);
-        expenseCategoryList.remove(expenseCategory);
-    }
-
-    public ExpenseCategory updateCategoryByCode(String code, String description)
-            throws EntityNotFoundException {
-        ExpenseCategory expenseCategory = getCategoryByCode(code);
-        expenseCategory.setDescription(description);
-        return expenseCategory;
+        return expenseCategoryRepository.getAllExpenseCategory();
     }
 
     void checkExistsCategoryByCode(String code) throws EntityAlreadyExistsException {
@@ -55,7 +41,7 @@ public class ExpenseCommandCategoryService {
     }
 
     Optional<ExpenseCategory> searchInListCategoryByCode(String code) {
-        return expenseCategoryList.stream()
+        return expenseCategoryRepository.getAllExpenseCategory().stream()
                 .filter(expenseCategory -> expenseCategory.getCode().equals(code))
                 .findFirst();
     }

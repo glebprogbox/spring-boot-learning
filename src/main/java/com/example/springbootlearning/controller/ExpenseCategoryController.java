@@ -3,7 +3,8 @@ package com.example.springbootlearning.controller;
 import com.example.springbootlearning.exceptions.EntityAlreadyExistsException;
 import com.example.springbootlearning.exceptions.EntityNotFoundException;
 import com.example.springbootlearning.domain.ExpenseCategory;
-import com.example.springbootlearning.service.ExpenseCommandCategoryService;
+import com.example.springbootlearning.service.ExpenseCategoryCommandService;
+import com.example.springbootlearning.service.ExpenseCateroryQueryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -18,15 +19,18 @@ import java.util.List;
 @RequestMapping("/api/v1/categories")
 @Validated
 public class ExpenseCategoryController {
-    private final ExpenseCommandCategoryService expenseCommandCategoryService;
+    private final ExpenseCategoryCommandService expenseCategoryCommandService;
+    private final ExpenseCateroryQueryService expenseCateroryQueryService;
 
-    public ExpenseCategoryController(ExpenseCommandCategoryService expenseCommandCategoryService) {
-        this.expenseCommandCategoryService = expenseCommandCategoryService;
+    public ExpenseCategoryController(ExpenseCategoryCommandService expenseCategoryCommandService,
+                                     ExpenseCateroryQueryService expenseCateroryQueryService) {
+        this.expenseCategoryCommandService = expenseCategoryCommandService;
+        this.expenseCateroryQueryService = expenseCateroryQueryService;
     }
 
     @GetMapping()
     public List<ExpenseCategory> getAllCategories() {
-        return expenseCommandCategoryService.getAllCategories();
+        return expenseCateroryQueryService.getAllCategories();
     }
 
     @GetMapping(path = "/{code}")
@@ -37,7 +41,7 @@ public class ExpenseCategoryController {
             @Pattern(regexp = "[A-ZА-Я_]*", message = "the code must match the template \"A-ZА-Я_\"")
             String code)
             throws EntityNotFoundException {
-        return expenseCommandCategoryService.getCategoryByCode(code);
+        return expenseCateroryQueryService.getCategoryByCode(code);
     }
 
     @PostMapping()
@@ -47,7 +51,7 @@ public class ExpenseCategoryController {
             @Valid
             ExpenseCategory expenseCategory)
             throws EntityAlreadyExistsException {
-        return expenseCommandCategoryService.createCategory(expenseCategory);
+        return expenseCategoryCommandService.createCategory(expenseCategory);
     }
 
     @DeleteMapping(path = "/{code}")
@@ -59,7 +63,7 @@ public class ExpenseCategoryController {
             @Pattern(regexp = "[A-ZА-Я_]*", message = "the code must match the template \"A-ZА-Я_\"")
             String code)
             throws EntityNotFoundException {
-        expenseCommandCategoryService.deleteCategoryByCode(code);
+        expenseCategoryCommandService.deleteCategoryByCode(code);
     }
 
     @PutMapping()
@@ -69,7 +73,7 @@ public class ExpenseCategoryController {
             @Valid
             ExpenseCategory expenseCategory)
             throws EntityNotFoundException {
-        return expenseCommandCategoryService.updateCategoryByCode(
+        return expenseCategoryCommandService.updateCategoryByCode(
                 expenseCategory.getCode(),
                 expenseCategory.getDescription());
     }
